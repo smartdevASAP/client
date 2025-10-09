@@ -1,9 +1,40 @@
 import { useState } from "react";
 import { Check, ArrowRight } from "lucide-react";
 import { imgs_assets } from "../assets/assets";
+import { useApp } from "../context/userContext";
 
 const Login = () => {
+  //local state
   const [currentStep, setCurrentStep] = useState(1);
+  //global call
+  const {
+    username,
+    setUsername,
+    // deleteUser,
+    // saveUser,
+    firstname,
+    setFirstname,
+    lastname,
+    setLastname,
+    phone,
+    setPhone,
+    birthDay,
+    setBirthDay,
+    password,
+    setPassword,
+    pronouns,
+    setPronouns,
+    confirmPassword,
+    setConfirmPassword,
+    confirmPhone,
+    setConfirmPhone,
+    email,
+    setEmail,
+    bio,
+    setBio,
+    sendToServer,
+  } = useApp();
+  //--END OF GLOBAL CALL
 
   const steps = [
     { id: 1, label: "basic info" },
@@ -20,6 +51,13 @@ const Login = () => {
     }
   };
 
+  // move to previous step
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
   // click handler for steps
   const handleStepClick = (id: number) => {
     setCurrentStep(id);
@@ -32,12 +70,16 @@ const Login = () => {
         <div className="space-y-6">
           <div className="md:flex md:space-y-0 space-y-4 gap-4">
             <input
+              onChange={(e) => setFirstname(e.target.value)}
+              value={firstname}
               type="text"
               className="p-3 border border-gray-300 placeholder-gray-300 rounded-sm w-full"
               placeholder="first name"
             />
             <input
               type="text"
+              onChange={(e) => setLastname(e.target.value)}
+              value={lastname}
               className="p-3 border border-gray-300 placeholder-gray-300 rounded-sm w-full"
               placeholder="second name"
             />
@@ -45,11 +87,15 @@ const Login = () => {
 
           <div className="md:flex md:space-y-0 space-y-4 gap-4">
             <input
+              onChange={(e) => setPhone(e.target.value)}
+              value={phone}
               type="text"
               className="p-3 border border-gray-300 placeholder-gray-300 rounded-sm w-full"
               placeholder="+254 -000-999-111"
             />
             <input
+              onChange={(e) => setBirthDay(e.target.value)}
+              value={birthDay}
               type="text"
               className="p-3 border border-gray-300 placeholder-gray-300 rounded-sm w-full"
               placeholder="YY/MM/DD"
@@ -58,12 +104,16 @@ const Login = () => {
 
           <div className="md:flex md:space-y-0 space-y-4 gap-4">
             <input
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
               type="password"
               className="p-3 border border-gray-300 placeholder-gray-300 rounded-sm w-full"
               placeholder="password"
             />
             <input
               type="password"
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              value={confirmPassword}
               className="p-3 border border-gray-300 placeholder-gray-300 rounded-sm w-full"
               placeholder="confirm password"
             />
@@ -75,18 +125,24 @@ const Login = () => {
     if (currentStep === 2) {
       return (
         <div className="space-y-6">
-          <input
-            type="text"
-            className="p-3 border border-gray-300 placeholder-gray-300 rounded-sm w-full"
+          <textarea
+            onChange={(e) => setBio(e.target.value)}
+            value={bio}
             placeholder="Bio"
-          />
+            className="p-3 border border-gray-300 placeholder-gray-300 rounded-sm w-full resize-none overflow-hidden"
+            rows={1}
+          ></textarea>
           <input
             type="text"
+            onChange={(e) => setUsername(e.target.value)}
+            value={username}
             className="p-3 border border-gray-300 placeholder-gray-300 rounded-sm w-full"
             placeholder="username"
           />
           <input
             type="text"
+            onChange={(e) => setPronouns(e.target.value)}
+            value={pronouns}
             className="p-3 border border-gray-300 placeholder-gray-300 rounded-sm w-full"
             placeholder="pronouns"
           />
@@ -99,13 +155,17 @@ const Login = () => {
         <div className="space-y-6">
           <input
             type=""
+            onChange={(e) => setConfirmPhone(e.target.value)}
+            value={confirmPhone}
             className="p-3 border border-gray-300 placeholder-gray-300 rounded-sm w-full"
             placeholder="phone number"
           />
           <input
             type="text"
+            onChange={(e) => setEmail(e.target.value)}
+            value={email}
             className="p-3 border border-gray-300 placeholder-gray-300 rounded-sm w-full"
-            placeholder="re enter email"
+            placeholder="rambo@example.com"
           />
         </div>
       );
@@ -120,7 +180,7 @@ const Login = () => {
           </h2>
 
           {/* Scrollable container */}
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 space-y-4 text-xs leading-relaxed h-[300px] sm:h-[100px] overflow-y-auto w-full shadow-sm">
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 space-y-4 text-xs leading-relaxed h-[300px] sm:h-[200px] overflow-y-auto w-full shadow-sm">
             <h3 className="text-lg font-bold text-gray-800 mb-2">
               Pixsy Terms of Service & User Agreement
             </h3>
@@ -175,11 +235,6 @@ const Login = () => {
               Policy.
             </label>
           </div>
-
-          {/* Continue button */}
-          {/* <button className="w-full mt-6 p-3 rounded-sm text-white font-semibold bg-[#0437FF] hover:bg-[#0025aa] transition-all duration-200">
-            Continue
-          </button> */}
         </div>
       );
     }
@@ -265,19 +320,34 @@ const Login = () => {
         {/* render step content conditionally */}
         {renderStepContent()}
 
-        <div className="mt-8">
+        {/* Back + Save & Continue buttons */}
+        <div className="mt-8 flex justify-between gap-4">
           <button
-            onClick={handleNext}
-            className="w-full bg-[#0437FF] p-3 flex items-center justify-center gap-2 text-white text-center rounded-sm shadow-xs"
+            onClick={handleBack}
+            className="w-1/2 bg-gray-200 text-gray-700 p-3 rounded-sm shadow-xs hover:bg-gray-300 transition-all duration-200"
           >
-            <span>{currentStep === steps.length ? "Finish" : "Continue"}</span>
+            Back
+          </button>
+          <button
+            onClick={() => {
+              if (currentStep === steps.length) {
+                sendToServer(); // only runs when Finish is showing
+              } else {
+                handleNext();
+              }
+            }}
+            className="w-1/2 bg-[#0437FF] p-3 flex items-center justify-center gap-2 text-white text-center rounded-sm shadow-xs"
+          >
+            <span>
+              {currentStep === steps.length ? "Finish" : "Save & Continue"}
+            </span>
             <ArrowRight size={20} />
           </button>
         </div>
       </div>
 
       {/* right container */}
-      <div className="hidden sm:flex flex-col  h-screen justify-center items-center sm:w-[40vw]  bg-[#0437FF] text-white font-bold text-center p-6">
+      <div className="hidden sm:flex flex-col h-screen justify-center items-center sm:w-[40vw] bg-[#0437FF] text-white font-bold text-center p-6">
         <h1 className="text-3xl mb-4 tracking-wide">...</h1>
         <p className="text-sm font-normal max-w-xs">
           Explore, connect with friends, and make memories with Pixsy.
