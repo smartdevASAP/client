@@ -258,7 +258,7 @@ const Login = () => {
           Create Account
         </h1>
         <p className="text-sm text-gray-600 mb-6">
-          Create a Pixsy account and enjoy connecting with friends and making
+          Create an account and enjoy connecting with friends and making
           memories.
         </p>
 
@@ -338,7 +338,7 @@ const Login = () => {
             }}
             className="w-1/2 bg-[#0437FF] p-3 flex items-center justify-center gap-2 text-white text-center rounded-sm shadow-xs"
           >
-            <span>
+            <span className="text-xs md:text-sm ">
               {currentStep === steps.length ? "Finish" : "Save & Continue"}
             </span>
             <ArrowRight size={20} />
@@ -350,7 +350,7 @@ const Login = () => {
       <div className="hidden sm:flex flex-col h-screen justify-center items-center sm:w-[40vw] bg-[#0437FF] text-white font-bold text-center p-6">
         <h1 className="text-3xl mb-4 tracking-wide">...</h1>
         <p className="text-sm font-normal max-w-xs">
-          Explore, connect with friends, and make memories with Pixsy.
+          Explore, connect with friends, and enjoy
         </p>
         {imgs_assets.map((img, index) => (
           <img

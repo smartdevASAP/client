@@ -30,7 +30,7 @@ type AppContextType = {
   setEmail: (val: string) => void;
   sendToServer: () => void;
 };
-
+//creating a context
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
