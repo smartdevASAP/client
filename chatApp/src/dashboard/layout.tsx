@@ -3,12 +3,8 @@ function Layout() {
   return (
     <div className="flex gap-4">
       <Sidebar />
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore natus
-        unde veniam nulla consequatur sit in praesentium nesciunt? Rerum quod
-        expedita aspernatur harum minima? Eligendi adipisci sint modi impedit
-        similique.
-      </p>
+      {/* main component here */}
+      <div></div>
     </div>
   );
 }
