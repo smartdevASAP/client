@@ -32,7 +32,6 @@ type AppContextType = {
 };
 //creating a context
 const AppContext = createContext<AppContextType | undefined>(undefined);
-
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   //all authentication details are to be kept here
   const [username, setUsername] = useState<string>(

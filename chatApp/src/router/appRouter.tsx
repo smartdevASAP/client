@@ -1,15 +1,13 @@
 import { Routes, Route } from "react-router-dom";
-import Login from "../authentication/login";
+//import Login from "../authentication/login";
 import Layout from "../dashboard/layout";
 // import Dashboard from "../pages/Dashboard";
 import ProtectedRoute from "./protectedRoutes";
-
 function AppRouter() {
   return (
     <Routes>
       {/* Public route unprotected */}
-      <Route path="/" element={<Login />} />
-
+      <Route path="/" element={<Layout />} />
       {/* Protected route */}
       <Route
         path="/dashboard"
