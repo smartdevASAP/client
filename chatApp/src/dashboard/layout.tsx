@@ -1,43 +1,35 @@
-// import Sidebar from "./sidebar";
-// import { Routes, Route } from "react-router-dom";
-// import Chats from "./chats";
-// import Feed from "./feed";
-// import Home from "./home";
-// import Post from "./post";
-// import Settings from "./settings";
-
-// function Layout() {
-//   return (
-//     <div className="flex gap-4">
-//       <Sidebar />
-//       <div className="flex-1 p-4">
-//         <Routes>
-//           <Route path="/" element={<Home />} />
-//           {/* <Route path="/home" element={<Home />} /> */}
-//           <Route path="/chats" element={<Chats />} />
-//           <Route path="/feed" element={<Feed />} />
-//           <Route path="/post" element={<Post />} />
-//           <Route path="/settings" element={<Settings />} />
-//         </Routes>
-//       </div>
-//     </div>
-//   );
-// }
-// export default Layout;
-
+import { useState } from "react";
 import Sidebar from "./sidebar";
-import { Outlet } from "react-router-dom";
+import Home from "./home";
+import Chats from "./chats";
+import Feed from "./feed";
+import Post from "./post";
+import Settings from "./settings";
 
-function Layout() {
+export default function Layout() {
+  const [activePage, setActivePage] = useState("home");
+
+  const renderPage = () => {
+    switch (activePage) {
+      case "home":
+        return <Home />;
+      case "feed":
+        return <Feed />;
+      case "chats":
+        return <Chats />;
+      case "post":
+        return <Post />;
+      case "settings":
+        return <Settings />;
+      default:
+        return <Home />;
+    }
+  };
+
   return (
-    <div className="flex gap-4">
-      <Sidebar />
-      <div className="flex-1 p-4">
-        {/* This renders the active child route */}
-        <Outlet />
-      </div>
+    <div className="flex gap-4 min-h-screen bg-gray-50">
+      <Sidebar activePage={activePage} setActivePage={setActivePage} />
+      <div className="flex-1 p-4">{renderPage()}</div>
     </div>
   );
 }
-
-export default Layout;

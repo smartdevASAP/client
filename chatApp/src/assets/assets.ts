@@ -5,8 +5,11 @@ import feed from "./feed.png";
 import home from "./home.png";
 import post from "./post.png";
 import settings from "./settings.png";
+import avatar from "./avatar.png";
 
 //---END OF DASHBOARD ASSETS
+export const main = [{ img: avatar }];
+
 export const imgs_assets = [
   {
     phones,

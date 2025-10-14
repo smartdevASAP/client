@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import {
   MessageSquare,
   Edit,
@@ -12,25 +11,51 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-// Sidebar.jsx
-// Usage: <Sidebar />
-// TailwindCSS required. lucide-react, framer-motion, and react-router-dom should be installed.
+type SidebarProps = {
+  activePage: string;
+  setActivePage: React.Dispatch<React.SetStateAction<string>>;
+  initialCollapsed?: boolean;
+};
 
 const navItems = [
-  { id: "home", label: "Home", icon: Home, path: "/home" },
-  { id: "feed", label: "Feed", icon: Rss, path: "/feed" },
-  { id: "chats", label: "Chats", icon: MessageSquare, path: "/chats" },
-  { id: "post", label: "Post", icon: Edit, path: "/posts" },
-  { id: "settings", label: "Settings", icon: Settings, path: "/settings" },
+  { id: "home", label: "Home", icon: Home },
+  { id: "feed", label: "Feed", icon: Rss },
+  { id: "chats", label: "Chats", icon: MessageSquare },
+  { id: "post", label: "Post", icon: Edit },
+  { id: "settings", label: "Settings", icon: Settings },
 ];
 
-export default function Sidebar({ initialCollapsed = false }) {
-  const location = useLocation();
+export default function Sidebar({
+  activePage,
+  setActivePage,
+  initialCollapsed = false,
+}: SidebarProps) {
   const [collapsed, setCollapsed] = useState(initialCollapsed);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  // Detect screen size on mount and resize
+  useEffect(() => {
+    const handleResize = () => {
+      const small = window.innerWidth < 768; // Tailwind's "md" breakpoint
+      setIsSmallScreen(small);
+      setCollapsed(small); // auto-collapse when small
+    };
+
+    handleResize(); // run on mount
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const handleToggle = () => {
+    // Disable toggle on small screens
+    if (isSmallScreen) return;
+    setCollapsed((prev) => !prev);
+  };
 
   return (
     <aside
-      className={`bg-white text-gray-800 shadow-lg rounded-2xl p-3 transition-width duration-300 flex flex-col justify-between border border-gray-100`}
+      className={`bg-white text-gray-800 shadow-lg rounded-2xl p-3 transition-all duration-300 flex flex-col justify-between border border-gray-100`}
       style={{ width: collapsed ? 72 : 260 }}
       aria-label="Primary sidebar"
     >
@@ -56,10 +81,20 @@ export default function Sidebar({ initialCollapsed = false }) {
           </motion.div>
 
           <button
-            onClick={() => setCollapsed(!collapsed)}
+            onClick={handleToggle}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className="ml-auto p-2 rounded-md hover:bg-gray-100 transition-colors"
-            title={collapsed ? "Expand" : "Collapse"}
+            className={`ml-auto p-2 rounded-md transition-colors ${
+              isSmallScreen
+                ? "opacity-40 cursor-not-allowed"
+                : "hover:bg-gray-100"
+            }`}
+            title={
+              isSmallScreen
+                ? "Unavailable on small screens"
+                : collapsed
+                ? "Expand"
+                : "Collapse"
+            }
           >
             {collapsed ? <Menu size={18} /> : <ChevronLeft size={18} />}
           </button>
@@ -69,16 +104,15 @@ export default function Sidebar({ initialCollapsed = false }) {
         <nav aria-label="Main navigation" className="space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location.pathname === item.path;
+            const isActive = activePage === item.id;
 
             return (
-              <Link
+              <button
                 key={item.id}
-                to={item.path}
-                className={`w-full flex items-center gap-3 rounded-xl p-2 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                onClick={() => setActivePage(item.id)}
+                className={`w-full flex items-center gap-3 rounded-xl p-2 hover:bg-gray-100 transition-colors ${
                   isActive ? "bg-blue-50 ring-1 ring-blue-200" : ""
                 }`}
-                aria-current={isActive ? "page" : undefined}
                 title={collapsed ? item.label : undefined}
               >
                 <div className="flex items-center justify-center w-9 h-9 rounded-lg">
@@ -102,13 +136,13 @@ export default function Sidebar({ initialCollapsed = false }) {
                     </p>
                   </div>
                 )}
-              </Link>
+              </button>
             );
           })}
         </nav>
       </div>
 
-      {/* Bottom: small utilities */}
+      {/* Bottom utilities */}
       <div className="mt-4">
         {!collapsed && (
           <div className="mb-3 px-1">
@@ -128,18 +162,6 @@ export default function Sidebar({ initialCollapsed = false }) {
             </div>
           </div>
         )}
-
-        <div className="px-1">
-          <Link
-            to="/settings"
-            className="w-full flex items-center gap-3 rounded-xl p-2 hover:bg-gray-100 transition-colors focus:outline-none"
-          >
-            <Settings size={16} />
-            {!collapsed && (
-              <span className="font-medium text-gray-800">Settings</span>
-            )}
-          </Link>
-        </div>
 
         <div className="mt-3 px-1 text-xs text-gray-500">
           {!collapsed ? (
