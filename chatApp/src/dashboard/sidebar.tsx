@@ -33,26 +33,47 @@ export default function Sidebar({
   const [collapsed, setCollapsed] = useState(initialCollapsed);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
-  // Detect screen size on mount and resize
   useEffect(() => {
     const handleResize = () => {
-      const small = window.innerWidth < 768; // Tailwind's "md" breakpoint
+      const small = window.innerWidth < 768;
       setIsSmallScreen(small);
-      setCollapsed(small); // auto-collapse when small
+      setCollapsed(small); // always collapsed on small screens
     };
-
-    handleResize(); // run on mount
+    handleResize();
     window.addEventListener("resize", handleResize);
-
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleToggle = () => {
-    // Disable toggle on small screens
     if (isSmallScreen) return;
     setCollapsed((prev) => !prev);
   };
 
+  // If on small screen → bottom navbar
+  if (isSmallScreen) {
+    return (
+      <nav className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-md flex justify-around py-2 z-50">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activePage === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActivePage(item.id)}
+              className={`flex flex-col items-center justify-center text-xs ${
+                isActive ? "text-blue-600" : "text-gray-500"
+              }`}
+            >
+              <Icon size={20} />
+              <span className="text-[10px] mt-1">{item.label}</span>
+            </button>
+          );
+        })}
+      </nav>
+    );
+  }
+
+  // Default desktop sidebar
   return (
     <aside
       className={`bg-white text-gray-800 shadow-lg rounded-2xl p-3 transition-all duration-300 flex flex-col justify-between border border-gray-100`}
@@ -83,18 +104,7 @@ export default function Sidebar({
           <button
             onClick={handleToggle}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className={`ml-auto p-2 rounded-md transition-colors ${
-              isSmallScreen
-                ? "opacity-40 cursor-not-allowed"
-                : "hover:bg-gray-100"
-            }`}
-            title={
-              isSmallScreen
-                ? "Unavailable on small screens"
-                : collapsed
-                ? "Expand"
-                : "Collapse"
-            }
+            className="ml-auto p-2 rounded-md hover:bg-gray-100 transition-colors"
           >
             {collapsed ? <Menu size={18} /> : <ChevronLeft size={18} />}
           </button>
@@ -105,7 +115,6 @@ export default function Sidebar({
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activePage === item.id;
-
             return (
               <button
                 key={item.id}
@@ -113,7 +122,6 @@ export default function Sidebar({
                 className={`w-full flex items-center gap-3 rounded-xl p-2 hover:bg-gray-100 transition-colors ${
                   isActive ? "bg-blue-50 ring-1 ring-blue-200" : ""
                 }`}
-                title={collapsed ? item.label : undefined}
               >
                 <div className="flex items-center justify-center w-9 h-9 rounded-lg">
                   <Icon size={18} />
@@ -131,9 +139,6 @@ export default function Sidebar({
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-gray-400">
-                      {item.id === "feed" ? "Curated" : ""}
-                    </p>
                   </div>
                 )}
               </button>
