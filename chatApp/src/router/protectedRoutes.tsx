@@ -8,7 +8,6 @@ type ProtectedRouteProps = {
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { username } = useApp();
-
   if (!username) {
     return <Navigate to="/" replace />;
   }

@@ -1,148 +1,231 @@
 import { useState } from "react";
-import { Bell, Lock, Moon, User, Trash2, LogOut } from "lucide-react";
+import { Check, Bell, Shield, User, Palette, Trash } from "lucide-react";
+import { useApp } from "../context/userContext";
 
-export default function Settings() {
-  const [darkMode, setDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState(true);
-  const [privateAccount, setPrivateAccount] = useState(false);
+const Settings = () => {
+  const [currentTab, setCurrentTab] = useState("account");
 
-  const handleLogout = () => {
-    alert("You have been logged out!");
-  };
+  const {
+    username,
+    setUsername,
+    firstname,
+    setFirstname,
+    lastname,
+    setLastname,
+    phone,
+    setPhone,
+    birthDay,
+    setBirthDay,
+    password,
+    setPassword,
+    pronouns,
+    setPronouns,
+    confirmPassword,
+    setConfirmPassword,
+    // confirmPhone,
+    // setConfirmPhone,
+    // email,
+    // setEmail,
+    bio,
+    setBio,
+    sendToServer,
+  } = useApp();
 
-  const handleDeleteAccount = () => {
-    const confirmDelete = confirm(
-      "Are you sure you want to delete your account?"
-    );
-    if (confirmDelete) alert("Account deleted successfully!");
+  const tabs = [
+    { id: "account", label: "Account", icon: <User size={18} /> },
+    { id: "appearance", label: "Appearance", icon: <Palette size={18} /> },
+    { id: "notifications", label: "Notifications", icon: <Bell size={18} /> },
+    { id: "privacy", label: "Privacy", icon: <Shield size={18} /> },
+    { id: "danger", label: "Danger Zone", icon: <Trash size={18} /> },
+  ];
+
+  const renderTab = () => {
+    switch (currentTab) {
+      case "account":
+        return (
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold text-gray-700 mb-4">
+              Edit Profile
+            </h2>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <input
+                onChange={(e) => setFirstname(e.target.value)}
+                value={firstname}
+                placeholder="First Name"
+                className="p-3 border border-gray-300 rounded-sm"
+              />
+              <input
+                onChange={(e) => setLastname(e.target.value)}
+                value={lastname}
+                placeholder="Last Name"
+                className="p-3 border border-gray-300 rounded-sm"
+              />
+              <input
+                onChange={(e) => setUsername(e.target.value)}
+                value={username}
+                placeholder="Username"
+                className="p-3 border border-gray-300 rounded-sm"
+              />
+              <input
+                onChange={(e) => setPronouns(e.target.value)}
+                value={pronouns}
+                placeholder="Pronouns"
+                className="p-3 border border-gray-300 rounded-sm"
+              />
+            </div>
+
+            <textarea
+              onChange={(e) => setBio(e.target.value)}
+              value={bio}
+              rows={3}
+              placeholder="Bio"
+              className="p-3 border border-gray-300 rounded-sm w-full resize-none"
+            />
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <input
+                onChange={(e) => setPhone(e.target.value)}
+                value={phone}
+                placeholder="Phone Number"
+                className="p-3 border border-gray-300 rounded-sm"
+              />
+              <input
+                onChange={(e) => setBirthDay(e.target.value)}
+                value={birthDay}
+                placeholder="Birth Date (YYYY/MM/DD)"
+                className="p-3 border border-gray-300 rounded-sm"
+              />
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <input
+                type="password"
+                onChange={(e) => setPassword(e.target.value)}
+                value={password}
+                placeholder="New Password"
+                className="p-3 border border-gray-300 rounded-sm"
+              />
+              <input
+                type="password"
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                value={confirmPassword}
+                placeholder="Confirm Password"
+                className="p-3 border border-gray-300 rounded-sm"
+              />
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                onClick={sendToServer}
+                className="px-6 py-3 bg-[#0437FF] text-white rounded-sm flex items-center gap-2"
+              >
+                Save Changes <Check size={18} />
+              </button>
+            </div>
+          </div>
+        );
+
+      case "appearance":
+        return (
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold text-gray-700 mb-4">Appearance</h2>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700">Dark Mode</span>
+              <input type="checkbox" className="w-5 h-5 accent-[#0437FF]" />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700">Compact Layout</span>
+              <input type="checkbox" className="w-5 h-5 accent-[#0437FF]" />
+            </div>
+          </div>
+        );
+
+      case "notifications":
+        return (
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold text-gray-700 mb-4">
+              Notifications
+            </h2>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700">New Message Alerts</span>
+              <input type="checkbox" className="w-5 h-5 accent-[#0437FF]" />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700">Friend Request Alerts</span>
+              <input type="checkbox" className="w-5 h-5 accent-[#0437FF]" />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700">Post Likes & Comments</span>
+              <input type="checkbox" className="w-5 h-5 accent-[#0437FF]" />
+            </div>
+          </div>
+        );
+
+      case "privacy":
+        return (
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold text-gray-700 mb-4">
+              Privacy & Security
+            </h2>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700">Private Account</span>
+              <input type="checkbox" className="w-5 h-5 accent-[#0437FF]" />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700">Hide Last Seen</span>
+              <input type="checkbox" className="w-5 h-5 accent-[#0437FF]" />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700">Allow Tagging</span>
+              <input type="checkbox" className="w-5 h-5 accent-[#0437FF]" />
+            </div>
+          </div>
+        );
+
+      case "danger":
+        return (
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold text-red-600 mb-4">Danger Zone</h2>
+            <p className="text-gray-700">
+              Deleting your account will permanently remove all your data,
+              chats, and posts. This action cannot be undone.
+            </p>
+            <button className="px-6 py-3 bg-red-600 text-white rounded-sm hover:bg-red-700">
+              Delete Account
+            </button>
+          </div>
+        );
+    }
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-6">
-      <h1 className="text-2xl font-bold text-gray-700">Settings</h1>
+    <div className="min-h-screen flex flex-col md:flex-row">
+      {/* Sidebar */}
+      <aside className="w-full md:w-64 bg-gray-50 border-r border-gray-200 p-4">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">Settings</h1>
+        <ul className="space-y-2">
+          {tabs.map((tab) => (
+            <li
+              key={tab.id}
+              onClick={() => setCurrentTab(tab.id)}
+              className={`flex items-center gap-3 p-3 rounded-md cursor-pointer transition-all duration-200 ${
+                currentTab === tab.id
+                  ? "bg-[#0437FF] text-white"
+                  : "hover:bg-gray-100 text-gray-700"
+              }`}
+            >
+              {tab.icon}
+              <span>{tab.label}</span>
+            </li>
+          ))}
+        </ul>
+      </aside>
 
-      {/* Account Section */}
-      <section className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4">
-        <h2 className="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2">
-          <User size={18} /> Account
-        </h2>
-
-        <div className="flex justify-between items-center py-2 border-b border-gray-100">
-          <span className="text-sm text-gray-600">Private Account</span>
-          <input
-            type="checkbox"
-            checked={privateAccount}
-            onChange={() => setPrivateAccount(!privateAccount)}
-            className="toggle-checkbox"
-          />
-        </div>
-
-        <div className="flex justify-between items-center py-2 border-b border-gray-100">
-          <span className="text-sm text-gray-600">Change Password</span>
-          <button className="text-blue-500 text-sm hover:underline">
-            Update
-          </button>
-        </div>
-
-        <div className="flex justify-between items-center py-2">
-          <span className="text-sm text-gray-600">Email</span>
-          <button className="text-blue-500 text-sm hover:underline">
-            Edit
-          </button>
-        </div>
-      </section>
-
-      {/* Notifications Section */}
-      <section className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4">
-        <h2 className="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2">
-          <Bell size={18} /> Notifications
-        </h2>
-
-        <div className="flex justify-between items-center py-2 border-b border-gray-100">
-          <span className="text-sm text-gray-600">Push Notifications</span>
-          <input
-            type="checkbox"
-            checked={notifications}
-            onChange={() => setNotifications(!notifications)}
-            className="toggle-checkbox"
-          />
-        </div>
-
-        <div className="flex justify-between items-center py-2">
-          <span className="text-sm text-gray-600">Email Notifications</span>
-          <input
-            type="checkbox"
-            checked={notifications}
-            onChange={() => setNotifications(!notifications)}
-            className="toggle-checkbox"
-          />
-        </div>
-      </section>
-
-      {/* App Preferences Section */}
-      <section className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4">
-        <h2 className="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2">
-          <Moon size={18} /> App Preferences
-        </h2>
-
-        <div className="flex justify-between items-center py-2">
-          <span className="text-sm text-gray-600">Dark Mode</span>
-          <input
-            type="checkbox"
-            checked={darkMode}
-            onChange={() => setDarkMode(!darkMode)}
-            className="toggle-checkbox"
-          />
-        </div>
-      </section>
-
-      {/* Security Section */}
-      <section className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4">
-        <h2 className="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2">
-          <Lock size={18} /> Security
-        </h2>
-
-        <div className="flex justify-between items-center py-2 border-b border-gray-100">
-          <span className="text-sm text-gray-600">
-            Two-Factor Authentication
-          </span>
-          <button className="text-blue-500 text-sm hover:underline">
-            Enable
-          </button>
-        </div>
-
-        <div className="flex justify-between items-center py-2">
-          <span className="text-sm text-gray-600">Device Management</span>
-          <button className="text-blue-500 text-sm hover:underline">
-            View
-          </button>
-        </div>
-      </section>
-
-      {/* Danger Zone */}
-      <section className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4">
-        <h2 className="text-lg font-semibold text-red-600 mb-3 flex items-center gap-2">
-          Danger Zone
-        </h2>
-
-        <div className="flex justify-between items-center py-2 border-b border-gray-100">
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600"
-          >
-            <LogOut size={16} /> Log Out
-          </button>
-        </div>
-
-        <div className="flex justify-between items-center py-2">
-          <button
-            onClick={handleDeleteAccount}
-            className="flex items-center gap-2 text-sm text-red-600 hover:text-red-700"
-          >
-            <Trash2 size={16} /> Delete Account
-          </button>
-        </div>
-      </section>
+      {/* Main Content */}
+      <main className="flex-1 p-6">{renderTab()}</main>
     </div>
   );
-}
+};
+
+export default Settings;
