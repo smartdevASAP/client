@@ -183,29 +183,19 @@
 // }
 
 //--MY CODE
-
 import { Link } from "react-router-dom";
 
 function Sidebar() {
   return (
-    <ul className="space-y-6 p-4 bg-white shadow-md rounded-xl">
+    <ul className="space-y-6">
       <li>
-        <Link to="/dashboard/chats" className="hover:text-blue-600 font-medium">
-          Chats
-        </Link>
+        <Link to="/dashboard/chats">Chats</Link>
       </li>
       <li>
-        <Link
-          to="/dashboard/settings"
-          className="hover:text-blue-600 font-medium"
-        >
-          Settings
-        </Link>
+        <Link to="/dashboard/settings">Settings</Link>
       </li>
       <li>
-        <Link to="/dashboard/posts" className="hover:text-blue-600 font-medium">
-          Posts
-        </Link>
+        <Link to="/dashboard/posts">Posts</Link>
       </li>
     </ul>
   );

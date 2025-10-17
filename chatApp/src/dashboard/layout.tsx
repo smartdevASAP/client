@@ -42,7 +42,7 @@
 // }
 
 //--new nested routing conscept
-import Dashboard from "./dashboard";
+import { Outlet } from "react-router-dom";
 import Sidebar from "./sidebar";
 
 export default function Layout() {
@@ -50,7 +50,8 @@ export default function Layout() {
     <div className="flex gap-4 min-h-screen bg-gray-50">
       <Sidebar />
       <div className="flex-1 p-4">
-        <Dashboard />
+        {/* All nested routes from Dashboard render here */}
+        <Outlet />
       </div>
     </div>
   );
