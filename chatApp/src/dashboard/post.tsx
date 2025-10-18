@@ -1,38 +1,16 @@
-import { useState } from "react";
 import { ImagePlus, Send } from "lucide-react";
-
-type Post = {
-  id: number;
-  caption: string;
-  image?: string;
-  time: string;
-};
+import { useApp } from "../context/postContext";
 
 export default function Posts() {
-  const [caption, setCaption] = useState("");
-  const [image, setImage] = useState<string | null>(null);
-  const [posts, setPosts] = useState<Post[]>([]);
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => setImage(reader.result as string);
-    reader.readAsDataURL(file);
-  };
-
-  const handlePost = () => {
-    if (!caption.trim() && !image) return;
-    const newPost: Post = {
-      id: Date.now(),
-      caption,
-      image: image || undefined,
-      time: "Just now",
-    };
-    setPosts([newPost, ...posts]);
-    setCaption("");
-    setImage(null);
-  };
+  const {
+    caption,
+    setCaption,
+    image,
+    setImage,
+    posts,
+    handleImageUpload,
+    handlePost,
+  } = useApp();
 
   return (
     <div className="max-w-2xl mx-auto p-4">
@@ -93,6 +71,7 @@ export default function Posts() {
         {posts.length === 0 ? (
           <p className="text-center text-gray-400">No posts yet.</p>
         ) : (
+          // when there are posts
           posts.map((post) => (
             <div
               key={post.id}
@@ -106,6 +85,11 @@ export default function Posts() {
                   className="w-full h-64 object-cover rounded-lg mb-3"
                 />
               )}
+              <div>
+                <p>Like</p>
+                <p>share</p>
+                <p>delete</p>
+              </div>
               <div className="text-xs text-gray-400">{post.time}</div>
             </div>
           ))

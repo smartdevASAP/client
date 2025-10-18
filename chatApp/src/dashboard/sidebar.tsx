@@ -69,7 +69,7 @@ export default function Sidebar({ initialCollapsed = false }) {
   // Desktop sidebar
   return (
     <aside
-      className={`bg-white text-gray-800 shadow-lg rounded-2xl p-3 transition-all duration-300 flex flex-col justify-between border border-gray-100`}
+      className={`h-[100vh] overflow-hidden flex-shrink-0 bg-white text-gray-800 shadow-lg rounded-2xl p-3 transition-all duration-300 flex flex-col justify-between border border-gray-100`}
       style={{ width: collapsed ? 72 : 260 }}
       aria-label="Primary sidebar"
     >
@@ -172,24 +172,3 @@ export default function Sidebar({ initialCollapsed = false }) {
     </aside>
   );
 }
-
-//--MY CODE
-// import { Link } from "react-router-dom";
-
-// function Sidebar() {
-//   return (
-//     <ul className="space-y-6">
-//       <li>
-//         <Link to="/dashboard/chats">Chats</Link>
-//       </li>
-//       <li>
-//         <Link to="/dashboard/settings">Settings</Link>
-//       </li>
-//       <li>
-//         <Link to="/dashboard/posts">Posts</Link>
-//       </li>
-//     </ul>
-//   );
-// }
-
-// export default Sidebar;
