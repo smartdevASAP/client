@@ -8,7 +8,7 @@ import Settings from "./settings";
 const Dashboard = () => {
   return (
     <Routes>
-      <Route index element={<Home />} />
+      <Route path="home" element={<Home />} />
       <Route path="chats" element={<Chats />} />
       <Route path="feed" element={<Feed />} />
       <Route path="posts" element={<Posts />} />
