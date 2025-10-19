@@ -6,7 +6,7 @@ import {
   type ReactNode,
 } from "react";
 
-// Define the Post type
+// Define the Post type (structure of each post)
 type Post = {
   id: number;
   caption: string;
@@ -14,7 +14,7 @@ type Post = {
   time: string;
 };
 
-// Define what the context provides
+// Define what data and functions the context will provide
 type AppContextType = {
   caption: string;
   setCaption: React.Dispatch<React.SetStateAction<string>>;
@@ -24,28 +24,36 @@ type AppContextType = {
   setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handlePost: () => void;
+  imagesAdded: File[]; // 👈 store the actual image files
+  setImagesAdded: React.Dispatch<React.SetStateAction<File[]>>; // 👈 expose setter if needed
 };
 
 // Create the context
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
-  // post-related states
+  // ---- (1) Define all states
   const [caption, setCaption] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [imagesAdded, setImagesAdded] = useState<File[]>([]); // 👈 new persistent array
 
-  // ---- (1) Handle image upload
+  // ---- (2) Handle image upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Convert file to a preview image (Base64)
     const reader = new FileReader();
     reader.onloadend = () => setImage(reader.result as string);
     reader.readAsDataURL(file);
+
+    // Store the actual image file in state
+    setImagesAdded((prev) => [...prev, file]); // 👈 append to existing images
+    console.log("Images added so far:", imagesAdded);
   };
 
-  // ---- (2) Handle posting
+  // ---- (3) Handle posting logic
   const handlePost = () => {
     if (!caption.trim() && !image) return;
 
@@ -56,18 +64,23 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       time: "Just now",
     };
 
-    setPosts((prev) => [newPost, ...prev]); // ✅ safer state update
+    // Add the new post to the top
+    setPosts((prev) => [newPost, ...prev]);
+
+    // Reset input fields
     setCaption("");
     setImage(null);
   };
 
-  // ---- (3) Initialize state (optional)
+  // ---- (4) Initialize states on mount (optional)
   useEffect(() => {
     setCaption("");
     setImage(null);
     setPosts([]);
+    setImagesAdded([]);
   }, []);
 
+  // ---- (5) Provide values to the entire app
   return (
     <AppContext.Provider
       value={{
@@ -79,6 +92,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         setPosts,
         handleImageUpload,
         handlePost,
+        imagesAdded,
+        setImagesAdded, // 👈 you can also use this from other components
       }}
     >
       {children}
@@ -86,7 +101,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Custom hook
+// ---- (6) Custom hook to use the context
 export const useApp = () => {
   const ctx = useContext(AppContext);
   if (!ctx) throw new Error("useApp must be used inside AppProvider");
