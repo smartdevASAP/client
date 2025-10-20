@@ -67,8 +67,7 @@ function Home() {
             imagesAdded.map((img, i) => (
               <img
                 key={i}
-                // src={img}
-                src={img}
+                src={URL.createObjectURL(img)}
                 alt=""
                 className="rounded-lg object-cover w-full h-40"
               />

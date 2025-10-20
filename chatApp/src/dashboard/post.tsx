@@ -1,6 +1,7 @@
 import { ImagePlus, Send } from "lucide-react";
 import { useApp } from "../context/postContext";
-
+import { Heart, Share2, Trash2 } from "lucide-react";
+import { useEffect } from "react";
 export default function Posts() {
   // Destructure all needed context values
   const {
@@ -11,9 +12,19 @@ export default function Posts() {
     posts,
     handleImageUpload,
     handlePost,
-    imagesAdded, // 👈 now we consume this from context
+    imagesAdded, //consume this from context
+    likes,
+    setLikes,
+    liked,
+    setLiked,
+    handleLikes,
   } = useApp();
+  //post stats
 
+  //default
+  useEffect(() => {
+    setLikes(likes);
+  }, []);
   return (
     <div className="max-w-2xl mx-auto p-4">
       {/* Create Post Section */}
@@ -23,13 +34,16 @@ export default function Posts() {
         </h2>
 
         {/* Caption input */}
-        <textarea
-          value={caption}
-          onChange={(e) => setCaption(e.target.value)}
-          placeholder="What's on your mind?"
-          className="w-full p-2 border border-gray-200 rounded-lg resize-none focus:ring-2 focus:ring-blue-200 outline-none text-sm mb-3"
-          rows={3}
-        />
+        {/* Caption input - show only after image is added */}
+        {(image || imagesAdded.length > 0) && (
+          <textarea
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+            placeholder="Add a caption..."
+            className="w-full p-2 border border-gray-200 rounded-lg resize-none focus:ring-2 focus:ring-blue-200 outline-none text-sm mb-3"
+            rows={3}
+          />
+        )}
 
         {/* Single preview image (if selected) */}
         {image && (
@@ -103,10 +117,21 @@ export default function Posts() {
                   className="w-full h-64 object-cover rounded-lg mb-3"
                 />
               )}
-              <div className="flex gap-5 items-center text-xs">
-                <p className="p-2 bg-pink-500 text-white rounded-sm">Like</p>
-                <p className="p-2 bg-green-500 text-white rounded-sm">Share</p>
-                <p className="p-2 bg-blue-500 text-white rounded-sm">Delete</p>
+              <div className="flex justify-between">
+                <div className="flex gap-5 items-center text-xs">
+                  <Heart
+                    onClick={() => {
+                      setLiked(!liked), handleLikes(0);
+                    }}
+                    size={20}
+                    className={
+                      liked ? "fill-red-500 text-red-500" : "fill-white"
+                    }
+                  />
+                  <Share2 size={20} />
+                  <Trash2 size={20} />
+                </div>
+                <p className="text-xs text-gray-400">likes:{likes}</p>
               </div>
               <div className="text-xs text-gray-400 mt-2">{post.time}</div>
             </div>

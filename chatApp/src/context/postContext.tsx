@@ -24,8 +24,13 @@ type AppContextType = {
   setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handlePost: () => void;
-  imagesAdded: File[]; // 👈 store the actual image files
-  setImagesAdded: React.Dispatch<React.SetStateAction<File[]>>; // 👈 expose setter if needed
+  imagesAdded: File[]; //store the actual image files
+  setImagesAdded: React.Dispatch<React.SetStateAction<File[]>>;
+  likes: number | undefined;
+  setLikes: (value: any) => any;
+  liked: boolean;
+  setLiked: React.Dispatch<React.SetStateAction<boolean>>;
+  handleLikes: (val: number) => number;
 };
 
 // Create the context
@@ -36,7 +41,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [caption, setCaption] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
-  const [imagesAdded, setImagesAdded] = useState<File[]>([]); // 👈 new persistent array
+  const [likes, setLikes] = useState<number | undefined>();
+  const [liked, setLiked] = useState<boolean>(false);
+  // const [imagesAdded, setImagesAdded] = useState<File[]>([]); // 👈 new persistent array
+  const [imagesAdded, setImagesAdded] = useState<File[]>([]);
 
   // ---- (2) Handle image upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,8 +87,16 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setPosts([]);
     setImagesAdded([]);
   }, []);
-
   // ---- (5) Provide values to the entire app
+  const handleLikes = (val: number): any => {
+    setLikes(val);
+    if (liked !== true) {
+      let newLikes = val + 1;
+      setLikes(newLikes);
+    } else {
+      setLikes(0);
+    }
+  };
   return (
     <AppContext.Provider
       value={{
@@ -93,7 +109,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         handleImageUpload,
         handlePost,
         imagesAdded,
-        setImagesAdded, // 👈 you can also use this from other components
+        setImagesAdded, //where all the images are stored in an arr
+        likes,
+        setLikes,
+        liked,
+        setLiked,
+        handleLikes,
       }}
     >
       {children}
