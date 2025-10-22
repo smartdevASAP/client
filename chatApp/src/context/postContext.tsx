@@ -5,16 +5,25 @@ import {
   useContext,
   type ReactNode,
 } from "react";
-// Define the Post type (structure of each post)
+
+// ---- (1) Define the Post type
 type Post = {
   id: number;
   caption: string;
   image?: string;
   time: string;
-  liked?: boolean; // ✅ add this line
+  liked?: boolean;
+  likes?: number; // track likes per post
 };
 
-// Define what data and functions the context will provide
+// ---- (2) Define Friend type
+type Friend = {
+  id: number;
+  name: string;
+  profilePic?: string;
+};
+
+// ---- (3) Define what data/functions the context provides
 type AppContextType = {
   caption: string;
   setCaption: React.Dispatch<React.SetStateAction<string>>;
@@ -24,44 +33,38 @@ type AppContextType = {
   setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handlePost: () => void;
-  imagesAdded: File[]; //store the actual image files
+  imagesAdded: File[];
   setImagesAdded: React.Dispatch<React.SetStateAction<File[]>>;
-  likes: number | undefined;
-  setLikes: (value: any) => any;
-  liked: boolean;
-  setLiked: React.Dispatch<React.SetStateAction<boolean>>;
-  handleLikes: (val: number) => number;
+  handleLikes: (postId: number) => void;
+  totalLikes: number;
+  friends: Friend[];
+  addFriend: (friend: Friend) => void;
 };
 
-// Create the context
+// ---- (4) Create the context
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
-  // ---- (1) Define all states
+  // ---- (5) States
   const [caption, setCaption] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
-  const [likes, setLikes] = useState<number | undefined>();
-  const [liked, setLiked] = useState<boolean>(false);
-  // const [imagesAdded, setImagesAdded] = useState<File[]>([]); // 👈 new persistent array
   const [imagesAdded, setImagesAdded] = useState<File[]>([]);
+  const [friends, setFriends] = useState<Friend[]>([]); //  friend list state
 
-  // ---- (2) Handle image upload
+  // ---- (6) Handle image upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Convert file to a preview image (Base64)
     const reader = new FileReader();
     reader.onloadend = () => setImage(reader.result as string);
     reader.readAsDataURL(file);
 
-    // Store the actual image file in state
-    setImagesAdded((prev) => [...prev, file]); // 👈 append to existing images
-    console.log("Images added so far:", imagesAdded);
+    setImagesAdded((prev) => [...prev, file]);
   };
 
-  // ---- (3) Handle posting logic
+  // ---- (7) Handle new post creation
   const handlePost = () => {
     if (!caption.trim() && !image) return;
 
@@ -70,34 +73,53 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       caption,
       image: image || undefined,
       time: "Just now",
+      liked: false,
+      likes: 0,
     };
 
-    // Add the new post to the top
     setPosts((prev) => [newPost, ...prev]);
-    console.log(imagesAdded);
-
-    // Reset input fields
     setCaption("");
     setImage(null);
   };
 
-  // ---- (4) Initialize states on mount (optional)
+  // ---- (8) Handle likes for a specific post
+  const handleLikes = (postId: number) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((post) => {
+        if (post.id === postId) {
+          const isLiked = post.liked ?? false;
+          const updatedLikes = isLiked
+            ? (post.likes ?? 0) - 1
+            : (post.likes ?? 0) + 1;
+          return { ...post, liked: !isLiked, likes: updatedLikes };
+        }
+        return post;
+      })
+    );
+  };
+
+  // ---- (9) Calculate total likes across all posts
+  const totalLikes = posts.reduce((sum, post) => sum + (post.likes || 0), 0);
+
+  // ---- (10) Add friend function
+  const addFriend = (friend: Friend) => {
+    setFriends((prev) => {
+      // prevent duplicates
+      if (prev.some((f) => f.id === friend.id)) return prev;
+      return [...prev, friend];
+    });
+  };
+
+  // ---- (11) Reset on mount
   useEffect(() => {
     setCaption("");
     setImage(null);
     setPosts([]);
     setImagesAdded([]);
+    setFriends([]); // clear friend list
   }, []);
-  // ---- (5) Provide values to the entire app
-  const handleLikes = (val: number): any => {
-    setLikes(val);
-    if (liked !== true) {
-      let newLikes = val + 1;
-      setLikes(newLikes);
-    } else {
-      setLikes(0);
-    }
-  };
+
+  // ---- (12) Provide values
   return (
     <AppContext.Provider
       value={{
@@ -110,12 +132,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         handleImageUpload,
         handlePost,
         imagesAdded,
-        setImagesAdded, //where all the images are stored in an arr
-        likes,
-        setLikes,
-        liked,
-        setLiked,
+        setImagesAdded,
         handleLikes,
+        totalLikes,
+        friends,
+        addFriend,
       }}
     >
       {children}
@@ -123,7 +144,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// ---- (6) Custom hook to use the context
+// ---- (13) Custom hook to use the context
 export const useApp = () => {
   const ctx = useContext(AppContext);
   if (!ctx) throw new Error("useApp must be used inside AppProvider");

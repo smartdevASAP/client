@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
-  MessageSquare,
+  // MessageSquare,
   Edit,
   Home,
   Rss,
@@ -9,17 +9,21 @@ import {
   Search,
   Menu,
   ChevronLeft,
+  Compass,
+  Users,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
 const navItems = [
   { id: "/dashboard/home", label: "Home", icon: Home },
+  { id: "/dashboard/explore", label: "Explore", icon: Compass },
+  { id: "/dashboard/friends", label: "Friends", icon: Users },
   { id: "/dashboard/feed", label: "Feed", icon: Rss },
-  { id: "/dashboard/chats", label: "Chats", icon: MessageSquare },
+  // { id: "/dashboard/chats", label: "Chats", icon: MessageSquare },
   { id: "/dashboard/posts", label: "Post", icon: Edit },
   { id: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
-
+//making the users in the dashboard have roles
 export default function Sidebar({ initialCollapsed = false }) {
   const [collapsed, setCollapsed] = useState(initialCollapsed);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
@@ -87,9 +91,9 @@ export default function Sidebar({ initialCollapsed = false }) {
             {!collapsed && (
               <div>
                 <h1 className="text-lg font-semibold text-gray-900">
-                  Kelvin UI
+                  Kelvin_K
                 </h1>
-                <p className="text-xs text-gray-500">Developer</p>
+                <p className="text-xs text-gray-500">user</p>
               </div>
             )}
           </motion.div>

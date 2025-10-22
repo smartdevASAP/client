@@ -1,5 +1,6 @@
 import { useApp } from "../context/postContext";
 import { waiting_img } from "../assets/assets";
+import { Link } from "react-router-dom";
 function Feed() {
   const { imagesAdded } = useApp();
 
@@ -16,9 +17,11 @@ function Feed() {
             <p className="text-sm mb-8 text-gray-700 text-center">
               waiting for you or your friends to upload images 😅
             </p>
-            <button className="p-2 rounded-sm bg-blue-600 text-white font-semibold shadow-sm w-full text-center">
-              Upload
-            </button>
+            <Link to="/dashboard/posts">
+              <button className="p-2 rounded-sm bg-blue-600 text-white font-semibold shadow-sm w-full text-center">
+                Upload
+              </button>
+            </Link>
           </div>
         </div>
       ) : (
