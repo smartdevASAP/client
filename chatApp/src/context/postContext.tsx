@@ -5,13 +5,13 @@ import {
   useContext,
   type ReactNode,
 } from "react";
-
 // Define the Post type (structure of each post)
 type Post = {
   id: number;
   caption: string;
   image?: string;
   time: string;
+  liked?: boolean; // ✅ add this line
 };
 
 // Define what data and functions the context will provide
@@ -74,6 +74,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
     // Add the new post to the top
     setPosts((prev) => [newPost, ...prev]);
+    console.log(imagesAdded);
 
     // Reset input fields
     setCaption("");
