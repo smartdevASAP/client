@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-
+import API from "../api/axios";
 //type to declare the users (email na akina username na the other stuffs like bio)
 type AppContextType = {
   username: string;
@@ -34,57 +34,65 @@ type AppContextType = {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   //all authentication details are to be kept here
-  const [username, setUsername] = useState<string>(
+  const [username, setUsername] = useState(
     localStorage.getItem("username") || ""
   );
-  const [firstname, setFirstname] = useState<string>(
-    localStorage.getItem("username") || ""
+  const [firstname, setFirstname] = useState(
+    localStorage.getItem("firstname") || ""
   );
-  const [lastname, setLastname] = useState<string>(
-    localStorage.getItem("username") || ""
+  const [lastname, setLastname] = useState(
+    localStorage.getItem("lastname") || ""
   );
-  const [phone, setPhone] = useState<string>(
-    localStorage.getItem("username") || ""
+  const [phone, setPhone] = useState(localStorage.getItem("phone") || "");
+  const [birthDay, setBirthDay] = useState(
+    localStorage.getItem("birthDay") || ""
   );
-  const [birthDay, setBirthDay] = useState<string>(
-    localStorage.getItem("username") || ""
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [bio, setBio] = useState(localStorage.getItem("bio") || "");
+  const [pronouns, setPronouns] = useState(
+    localStorage.getItem("pronouns") || ""
   );
-  const [password, setPassword] = useState<string>(
-    localStorage.getItem("username") || ""
-  );
-  const [confirmPassword, setConfirmPassword] = useState<string>(
-    localStorage.getItem("username") || ""
-  );
-  const [bio, setBio] = useState<string>(
-    localStorage.getItem("username") || ""
-  );
-  const [pronouns, setPronouns] = useState<string>(
-    localStorage.getItem("username") || ""
-  );
-  const [confirmPhone, setConfirmPhone] = useState<string>(
-    localStorage.getItem("username") || ""
-  );
-  const [email, setEmail] = useState<string>(
-    localStorage.getItem("username") || ""
-  );
+  const [confirmPhone, setConfirmPhone] = useState("");
+  const [email, setEmail] = useState(localStorage.getItem("email") || "");
+
   const navigate = useNavigate();
   //finish up button
-  const sendToServer = (): any => {
-    console.log({
-      username,
-      firstname,
-      lastname,
-      phone,
-      birthDay,
-      password,
-      pronouns,
-      confirmPassword,
-      confirmPhone,
-      email,
-      bio,
-    });
-    navigate("/dashboard");
-    localStorage.clear();
+  const sendToServer = async (): Promise<void> => {
+    try {
+      const payload = {
+        //everything  i was loggin in the console
+        username,
+        firstname,
+        lastname,
+        phone,
+        birthDay,
+        password,
+        pronouns,
+        confirmPassword,
+        confirmPhone,
+        email,
+        bio,
+      };
+      const res = await API.post("/users/register", payload);
+      if (res.data.success) {
+        console.log("user registered succesfully: " + res.data.User);
+        // Store useful data in localStorage
+        localStorage.setItem("username", username);
+        localStorage.setItem("email", email);
+
+        // (Optional) If your backend sends a token:
+        // localStorage.setItem("token", res.data.token);
+        navigate("dashboard/home");
+      } else {
+        console.log("registration failed: " + res.data.message);
+      }
+    } catch (err: any) {
+      console.error(
+        "🔥 Error sending data:",
+        err.response?.data || err.message
+      );
+    }
   };
 
   //----END OF AUTHENTICATION DETAILS

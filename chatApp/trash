@@ -76,3 +76,26 @@
 // };
 
 // export default Login;
+
+
+
+
+
+
+  // const sendToServer = (): any => {
+  //   console.log({
+      // username,
+      // firstname,
+      // lastname,
+      // phone,
+      // birthDay,
+      // password,
+      // pronouns,
+      // confirmPassword,
+      // confirmPhone,
+      // email,
+      // bio,
+  //   });
+  //   navigate("/dashboard");
+  //   localStorage.clear();
+  // };

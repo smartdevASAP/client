@@ -1,18 +1,27 @@
-import { Navigate } from "react-router-dom";
-import { useApp } from "../context/userContext";
-import type { ReactNode } from "react";
+// import { Navigate } from "react-router-dom";
+// import { useApp } from "../context/userContext";
+// import type { ReactNode } from "react";
 
-type ProtectedRouteProps = {
-  children: ReactNode;
-};
+// type ProtectedRouteProps = {
+//   children: ReactNode;
+// };
 
-const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { username } = useApp();
-  if (!username) {
-    return <Navigate to="/" replace />;
-  }
+// const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+//   const { username } = useApp();
+//   if (!username) {
+//     return <Navigate to="/" replace />;
+//   }
 
-  return <>{children}</>;
+//   return <>{children}</>;
+// };
+
+// export default ProtectedRoute;
+import { Navigate, Outlet } from "react-router-dom";
+
+const ProtectedRoute = () => {
+  const username = localStorage.getItem("username"); // check username instead of token
+
+  return username ? <Outlet /> : <Navigate to="/" replace />;
 };
 
 export default ProtectedRoute;
