@@ -5,7 +5,7 @@ import {
   useContext,
   type ReactNode,
 } from "react";
-
+import API from "../api/axios";
 // ---- (1) Define the Post type
 type Post = {
   id: number;
@@ -39,6 +39,7 @@ type AppContextType = {
   totalLikes: number;
   friends: Friend[];
   addFriend: (friend: Friend) => void;
+  fetchAllPosts: () => void;
 };
 
 // ---- (4) Create the context
@@ -65,21 +66,56 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // ---- (7) Handle new post creation
-  const handlePost = () => {
-    if (!caption.trim() && !image) return;
+  // const handlePost = () => {
+  //   if (!caption.trim() && !image) return;
 
-    const newPost: Post = {
-      id: Date.now(),
-      caption,
-      image: image || undefined,
-      time: "Just now",
-      liked: false,
-      likes: 0,
-    };
+  //   const newPost: Post = {
+  //     id: Date.now(),
+  //     caption,
+  //     image: image || undefined,
+  //     time: "Just now",
+  //     liked: false,
+  //     likes: 0,
+  //   };
 
-    setPosts((prev) => [newPost, ...prev]);
-    setCaption("");
-    setImage(null);
+  //   setPosts((prev) => [newPost, ...prev]);
+  //   setCaption("");
+  //   setImage(null);
+  // };
+
+  const handlePost = async () => {
+    if (!caption.trim() && imagesAdded.length === 0) return;
+
+    try {
+      const formData = new FormData();
+      formData.append("caption", caption);
+
+      // Optional: include user info
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      if (user.username) formData.append("username", user.username);
+
+      imagesAdded.forEach((file) => {
+        formData.append("images", file);
+      });
+
+      const res = await API.post("/post/create", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (res.data.success) {
+        console.log("✅ Post created:", res.data.post);
+        setCaption("");
+        setImage(null);
+        setImagesAdded([]);
+      } else {
+        console.log("❌ Failed to post:", res.data.message);
+      }
+    } catch (error: any) {
+      console.error(
+        "🔥 Error creating post:",
+        error.response?.data || error.message
+      );
+    }
   };
 
   // ---- (8) Handle likes for a specific post
@@ -118,7 +154,27 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setImagesAdded([]);
     setFriends([]); // clear friend list
   }, []);
+  //fetch all posts
+  const fetchAllPosts = async (): Promise<void> => {
+    try {
+      const res = await API.get("/post/allPosts"); // ✅ your route is "/post", not "/post/allPosts"
 
+      if (res.data.success) {
+        setPosts(res.data.posts); // ✅ assuming backend returns { success: true, posts: [...] }
+      } else {
+        console.error("❌ Failed to fetch posts:", res.data.message);
+      }
+    } catch (error: any) {
+      console.error(
+        "🔥 Error fetching posts:",
+        error.response?.data || error.message
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchAllPosts();
+  }, []);
   // ---- (12) Provide values
   return (
     <AppContext.Provider
@@ -137,6 +193,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         totalLikes,
         friends,
         addFriend,
+        fetchAllPosts,
       }}
     >
       {children}

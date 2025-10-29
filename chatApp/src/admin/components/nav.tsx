@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-
+import { useAdmin } from "../../context/adminContext";
 function Nav() {
   const [open, setOpen] = useState(false);
+  const { logoutAdmin } = useAdmin();
 
   return (
     <nav className="bg-white border-b border-blue-100 p-3 shadow-sm sticky top-0 z-50">
@@ -25,11 +26,17 @@ function Nav() {
           <Link to="/panel/posts" className="hover:text-blue-600">
             Posts
           </Link>
+          <Link to="/panel/profile" className="hover:text-blue-600">
+            profile
+          </Link>
         </ul>
 
         {/* Profile Button (desktop) */}
-        <button className="hidden md:block bg-red-500 text-xs text-white px-4 py-2 font-semibold rounded-md shadow-sm hover:bg-blue-800 transition">
-          <Link to="/panel/profile">Logout</Link>
+        <button
+          onClick={() => logoutAdmin()}
+          className="hidden md:block bg-red-500 text-xs text-white px-4 py-2 font-semibold rounded-md shadow-sm hover:bg-blue-800 transition"
+        >
+          Logout
         </button>
 
         {/* Mobile Menu Toggle */}

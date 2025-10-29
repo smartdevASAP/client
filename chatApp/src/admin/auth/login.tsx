@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-
-export default function Login() {
+import { useAdmin } from "../../context/adminContext";
+export default function LoginAdmin() {
+  const { setEmail, setPassword, email, password, loginAdmin } = useAdmin();
   return (
     <div className="flex items-center justify-center h-screen bg-gradient-to-br from-gray-900 to-gray-800">
       <motion.div
@@ -13,16 +14,20 @@ export default function Login() {
           Admin Login
         </h1>
 
-        <form className="flex flex-col space-y-4">
+        <div className="flex flex-col space-y-4">
           <input
             type="text"
-            placeholder="Username"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="email"
             name="username"
             className="p-3 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           <input
             type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
             name="password"
             className="p-3 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -33,12 +38,12 @@ export default function Login() {
           </p>
 
           <button
-            type="submit"
+            onClick={() => loginAdmin()}
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition-all duration-200"
           >
             Login
           </button>
-        </form>
+        </div>
       </motion.div>
     </div>
   );

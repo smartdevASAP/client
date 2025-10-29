@@ -71,6 +71,7 @@ import { Routes, Route } from "react-router-dom";
 import Login from "../authentication/login";
 import Main from "../admin/components/main";
 import Layout from "../dashboard/layout";
+import LoginAdmin from "../admin/auth/login";
 import ProtectedRoute from "./protectedRoutes";
 
 function AppRouter() {
@@ -84,7 +85,7 @@ function AppRouter() {
         {/* Dashboard */}
         <Route path="/dashboard/*" element={<Layout />} />
         {/* Admin */}
-        <Route path="/admin/*" element={<Main />} />
+        <Route path="/admin/*" element={<LoginAdmin />} />
         {/* Panel (optional if different) */}
         <Route path="/panel/*" element={<Main />} />
       </Route>

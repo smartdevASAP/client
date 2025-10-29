@@ -13,7 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import { motion } from "framer-motion";
-
+const username = localStorage.getItem("username");
 const navItems = [
   { id: "/dashboard/home", label: "Home", icon: Home },
   { id: "/dashboard/explore", label: "Explore", icon: Compass },
@@ -91,7 +91,7 @@ export default function Sidebar({ initialCollapsed = false }) {
             {!collapsed && (
               <div>
                 <h1 className="text-lg font-semibold text-gray-900">
-                  Kelvin_K
+                  {username}
                 </h1>
                 <p className="text-xs text-gray-500">user</p>
               </div>

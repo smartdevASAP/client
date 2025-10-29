@@ -3,7 +3,7 @@ import { Share2, Edit3 } from "lucide-react";
 
 function Home() {
   const { imagesAdded, posts, totalLikes, friends } = useApp();
-
+  const username = localStorage.getItem("username");
   return (
     <>
       {/* --- Profile Info Section --- */}
@@ -15,7 +15,7 @@ function Home() {
             alt=""
           />
         </div>
-        <p className="text-sm text-gray-500 ">Kelvin_k</p>
+        <p className="text-sm text-gray-500 ">{username}</p>
 
         <section className="flex justify-center items-center gap-8 md:gap-16">
           <div>
