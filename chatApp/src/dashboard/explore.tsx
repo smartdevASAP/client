@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { UserPlus, Search } from "lucide-react";
 import { useApp } from "../context/postContext"; // ✅ import the context
-
 const Explore: React.FC = () => {
   const { addFriend, friends } = useApp(); // ✅ use context
 
