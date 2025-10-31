@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Check, Bell, Shield, User, Palette, Trash } from "lucide-react";
-import { useApp } from "../context/userContext";
+import { useApp1 } from "../context/userContext";
 
 const Settings = () => {
   const [currentTab, setCurrentTab] = useState("account");
@@ -29,7 +29,7 @@ const Settings = () => {
     bio,
     setBio,
     sendToServer,
-  } = useApp();
+  } = useApp1();
 
   const tabs = [
     { id: "account", label: "Account", icon: <User size={18} /> },

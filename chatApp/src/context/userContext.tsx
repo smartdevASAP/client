@@ -29,6 +29,8 @@ type AppContextType = {
   email: string;
   setEmail: (val: string) => void;
   sendToServer: () => void;
+  actualUser: any;
+  setActualUser: (val: any) => any;
 };
 //creating a context
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -55,6 +57,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   );
   const [confirmPhone, setConfirmPhone] = useState("");
   const [email, setEmail] = useState(localStorage.getItem("email") || "");
+  const [actualUser, setActualUser] = useState([]);
 
   const navigate = useNavigate();
   //finish up button
@@ -112,6 +115,22 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     localStorage.setItem("username", username);
   }, [username]);
+  //----VERY IMPORTANT 👇
+  //running whenever the component is mounting on the browser
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await API.get("/post/allPosts");
+        setActualUser(res.data);
+        console.log(res.data.posts.length); // or setPosts(res.data)
+      } catch (err) {
+        console.error("Error fetching posts:", err);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
   return (
     <AppContext.Provider
       value={{
@@ -140,6 +159,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         bio,
         setBio,
         sendToServer,
+        actualUser,
+        setActualUser,
       }}
     >
       {children}
@@ -147,7 +168,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useApp = () => {
+export const useApp1 = () => {
   const ctx = useContext(AppContext);
   if (!ctx) throw new Error("useApp must be used inside AppProvider");
   return ctx;

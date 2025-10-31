@@ -6,14 +6,16 @@ import {
   type ReactNode,
 } from "react";
 import API from "../api/axios";
+
 // ---- (1) Define the Post type
 type Post = {
-  id: number;
+  _id: string; // MongoDB ID
   caption: string;
-  image?: string;
-  time: string;
-  liked?: boolean;
-  likes?: number; // track likes per post
+  images?: string[]; // multiple image URLs
+  likes?: number;
+  liked?: boolean; // local UI tracking (not from DB)
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 // ---- (2) Define Friend type
@@ -32,14 +34,14 @@ type AppContextType = {
   posts: Post[];
   setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handlePost: () => void;
+  handlePost: () => Promise<void>;
   imagesAdded: File[];
   setImagesAdded: React.Dispatch<React.SetStateAction<File[]>>;
-  handleLikes: (postId: number) => void;
+  handleLikes: (postId: string) => void;
   totalLikes: number;
   friends: Friend[];
   addFriend: (friend: Friend) => void;
-  fetchAllPosts: () => void;
+  fetchAllPosts: () => Promise<void>;
 };
 
 // ---- (4) Create the context
@@ -51,7 +53,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [image, setImage] = useState<string | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [imagesAdded, setImagesAdded] = useState<File[]>([]);
-  const [friends, setFriends] = useState<Friend[]>([]); //  friend list state
+  const [friends, setFriends] = useState<Friend[]>([]);
 
   // ---- (6) Handle image upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,32 +67,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setImagesAdded((prev) => [...prev, file]);
   };
 
-  // ---- (7) Handle new post creation
-  // const handlePost = () => {
-  //   if (!caption.trim() && !image) return;
-
-  //   const newPost: Post = {
-  //     id: Date.now(),
-  //     caption,
-  //     image: image || undefined,
-  //     time: "Just now",
-  //     liked: false,
-  //     likes: 0,
-  //   };
-
-  //   setPosts((prev) => [newPost, ...prev]);
-  //   setCaption("");
-  //   setImage(null);
-  // };
-
-  const handlePost = async () => {
+  // ---- (7) Handle creating a post
+  const handlePost = async (): Promise<void> => {
     if (!caption.trim() && imagesAdded.length === 0) return;
 
     try {
       const formData = new FormData();
       formData.append("caption", caption);
 
-      // Optional: include user info
+      // include logged-in user info if exists
       const user = JSON.parse(localStorage.getItem("user") || "{}");
       if (user.username) formData.append("username", user.username);
 
@@ -107,6 +92,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         setCaption("");
         setImage(null);
         setImagesAdded([]);
+
+        // add new post instantly to UI
+        setPosts((prev) => [res.data.post, ...prev]);
       } else {
         console.log("❌ Failed to post:", res.data.message);
       }
@@ -118,11 +106,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // ---- (8) Handle likes for a specific post
-  const handleLikes = (postId: number) => {
+  // ---- (8) Handle likes
+  const handleLikes = (postId: string) => {
     setPosts((prevPosts) =>
       prevPosts.map((post) => {
-        if (post.id === postId) {
+        if (post._id === postId) {
           const isLiked = post.liked ?? false;
           const updatedLikes = isLiked
             ? (post.likes ?? 0) - 1
@@ -134,33 +122,23 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
-  // ---- (9) Calculate total likes across all posts
+  // ---- (9) Total likes across all posts
   const totalLikes = posts.reduce((sum, post) => sum + (post.likes || 0), 0);
 
-  // ---- (10) Add friend function
+  // ---- (10) Add a friend
   const addFriend = (friend: Friend) => {
     setFriends((prev) => {
-      // prevent duplicates
       if (prev.some((f) => f.id === friend.id)) return prev;
       return [...prev, friend];
     });
   };
 
-  // ---- (11) Reset on mount
-  useEffect(() => {
-    setCaption("");
-    setImage(null);
-    setPosts([]);
-    setImagesAdded([]);
-    setFriends([]); // clear friend list
-  }, []);
-  //fetch all posts
+  // ---- (11) Fetch all posts
   const fetchAllPosts = async (): Promise<void> => {
     try {
-      const res = await API.get("/post/allPosts"); // ✅ your route is "/post", not "/post/allPosts"
-
-      if (res.data.success) {
-        setPosts(res.data.posts); // ✅ assuming backend returns { success: true, posts: [...] }
+      const res = await API.get("/post/allPosts");
+      if (res.data.success && Array.isArray(res.data.posts)) {
+        setPosts(res.data.posts);
       } else {
         console.error("❌ Failed to fetch posts:", res.data.message);
       }
@@ -172,10 +150,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // ---- (12) Fetch posts on mount
   useEffect(() => {
     fetchAllPosts();
   }, []);
-  // ---- (12) Provide values
+
+  // ---- (13) Provide context
   return (
     <AppContext.Provider
       value={{
@@ -201,7 +181,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// ---- (13) Custom hook to use the context
+// ---- (14) Custom hook to use context
 export const useApp = () => {
   const ctx = useContext(AppContext);
   if (!ctx) throw new Error("useApp must be used inside AppProvider");

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Check, ArrowRight } from "lucide-react";
 import { imgs_assets } from "../assets/assets";
-import { useApp } from "../context/userContext";
+import { useApp1 } from "../context/userContext";
 
 const Login = () => {
   //local state
@@ -33,7 +33,7 @@ const Login = () => {
     bio,
     setBio,
     sendToServer,
-  } = useApp();
+  } = useApp1();
   //--END OF GLOBAL CALL
 
   const steps = [
