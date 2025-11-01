@@ -4,7 +4,6 @@ import { useApp1 } from "../context/userContext";
 import { Share2, Edit3 } from "lucide-react";
 import API from "../api/axios";
 
-// 🧩 Define the same Post type used in postContext
 type Post = {
   _id: string;
   caption: string;
@@ -20,23 +19,20 @@ function Home() {
   const { setActualUser } = useApp1();
   const username = localStorage.getItem("username");
 
-  // Local state to hold posts data
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch posts on mount
   useEffect(() => {
     const fetchPosts = async () => {
       try {
+        setLoading(true);
         const res = await API.get("/post/allPosts");
         if (res.data.success && Array.isArray(res.data.posts)) {
           setPosts(res.data.posts);
         } else {
           console.error("❌ Failed to fetch posts:", res.data.message);
         }
-
         setActualUser(res.data);
-        console.log("Fetched posts:", res.data.posts);
       } catch (err) {
         console.error("🔥 Error fetching posts:", err);
       } finally {
@@ -92,13 +88,11 @@ function Home() {
         </div>
 
         <div className="flex justify-center gap-4 mt-4">
-          {/* Share Profile Button */}
           <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-full shadow-sm hover:bg-blue-700 active:scale-95 transition-all">
             <Share2 size={18} />
             <span className="text-sm font-medium">Share Profile</span>
           </button>
 
-          {/* Edit Profile Button */}
           <button className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 active:scale-95 transition-all">
             <Edit3 size={18} className="text-gray-600" />
             <span className="text-sm font-medium">Edit Profile</span>
@@ -114,7 +108,12 @@ function Home() {
         <h1 className="text-2xl text-gray-600 font-bold mb-3">Posts</h1>
 
         {loading ? (
-          <p className="text-gray-400 text-sm text-center">Loading posts...</p>
+          <div className="flex flex-col items-center justify-center min-h-[50vh]">
+            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p className="text-gray-500 text-sm font-medium">
+              Fetching your posts...
+            </p>
+          </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {posts.length === 0 ? (
@@ -127,7 +126,6 @@ function Home() {
                   key={post._id}
                   className="flex flex-col items-center bg-white rounded-xl shadow-sm p-2 hover:shadow-md transition-all duration-200"
                 >
-                  {/* Map through each post's images safely */}
                   {post.images && post.images.length > 0 ? (
                     post.images.map((imgUrl, i) => (
                       <img
@@ -143,12 +141,10 @@ function Home() {
                     </div>
                   )}
 
-                  {/* Caption */}
                   <p className="mt-2 text-gray-600 text-sm text-center truncate w-full">
                     {post.caption || "No caption"}
                   </p>
 
-                  {/* Likes */}
                   <p className="text-xs text-gray-400 mt-1">
                     {post.likes ?? 0} {post.likes === 1 ? "like" : "likes"}
                   </p>

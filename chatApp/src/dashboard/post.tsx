@@ -1,6 +1,19 @@
 import { ImagePlus, Send, Heart, Share2, Trash2 } from "lucide-react";
 import { useApp } from "../context/postContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import API from "../api/axios";
+import { useApp1 } from "../context/userContext";
+import toast from "react-hot-toast";
+
+type Post = {
+  _id: string;
+  caption: string;
+  images?: string[];
+  likes?: number;
+  liked?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
 
 export default function Posts() {
   const {
@@ -8,16 +21,69 @@ export default function Posts() {
     setCaption,
     image,
     setImage,
-    posts,
+    imagesAdded,
     handleImageUpload,
     handlePost,
-    imagesAdded,
     handleLikes,
   } = useApp();
 
+  const { setActualUser } = useApp1();
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // 🔥 Fetch posts from DB
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      const res = await API.get("/post/allPosts", {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
+
+      if (res.data.success && Array.isArray(res.data.posts)) {
+        setPosts(res.data.posts);
+        setActualUser(res.data.user || {});
+      } else {
+        toast.error(res.data.message || "Failed to fetch posts");
+      }
+    } catch (err) {
+      console.error("🔥 Error fetching posts:", err);
+      toast.error("Error loading posts");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // Optionally log posts or do setup here
+    fetchPosts();
   }, []);
+
+  // 🗑️ Delete Post
+  const deletePost = async (postId: string) => {
+    const token = localStorage.getItem("token");
+    toast.loading("Deleting post...");
+
+    try {
+      const res = await API.delete(`/post/delete/${postId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        toast.dismiss();
+        toast.success("Post deleted successfully ✨");
+        setPosts((prev) => prev.filter((p) => p._id !== postId));
+      } else {
+        toast.dismiss();
+        toast.error(res.data.message || "Failed to delete post");
+      }
+    } catch (err) {
+      console.error("Error deleting post:", err);
+      toast.dismiss();
+      toast.error("An error occurred while deleting");
+    }
+  };
 
   return (
     <div className="max-w-2xl mx-auto p-4">
@@ -53,19 +119,6 @@ export default function Posts() {
           </div>
         )}
 
-        {imagesAdded.length > 0 && (
-          <div className="mb-3">
-            <h3 className="text-sm font-medium text-gray-600 mb-1">
-              Uploaded Files:
-            </h3>
-            <ul className="text-xs text-gray-500 list-disc pl-5">
-              {imagesAdded.map((file, index) => (
-                <li key={index}>{file.name}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-
         <div className="flex items-center justify-between">
           <label className="flex items-center gap-2 text-gray-600 cursor-pointer hover:text-blue-600 text-sm">
             <ImagePlus size={18} />
@@ -90,39 +143,53 @@ export default function Posts() {
 
       {/* Feed */}
       <div className="space-y-4">
-        {posts.length === 0 ? (
+        {loading ? (
+          <p className="text-center text-gray-400">Loading posts...</p>
+        ) : posts.length === 0 ? (
           <p className="text-center text-gray-400">No posts yet.</p>
         ) : (
           posts.map((post) => (
             <div
-              key={post.id}
-              className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4"
+              key={post._id}
+              className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 hover:shadow-md transition-all duration-200"
             >
               <p className="text-gray-700 text-sm mb-3">{post.caption}</p>
 
-              {post.image && (
-                <img
-                  src={post.image}
-                  alt=""
-                  className="w-full h-64 object-cover rounded-lg mb-3"
-                />
+              {post.images && post.images.length > 0 && (
+                <div className="grid grid-cols-1 gap-2 mb-3">
+                  {post.images.map((img, i) => (
+                    <img
+                      key={i}
+                      src={img}
+                      alt=""
+                      className="w-full h-64 object-cover rounded-lg"
+                    />
+                  ))}
+                </div>
               )}
 
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <div className="flex gap-5 items-center text-xs">
                   <Heart
-                    onClick={() => handleLikes(post.id)}
+                    onClick={() => handleLikes(post._id)}
                     size={20}
                     className={`cursor-pointer transition ${
                       post.liked ? "fill-red-500 text-red-500" : "fill-white"
                     }`}
                   />
-                  <Share2 size={20} />
-                  <Trash2 size={20} />
+                  <Share2 size={20} className="cursor-pointer" />
+                  <Trash2
+                    onClick={() => deletePost(post._id)}
+                    size={20}
+                    className="cursor-pointer text-gray-500 hover:text-red-500 transition"
+                  />
                 </div>
-                <p className="text-xs text-gray-400">likes: {post.likes}</p>
+                <p className="text-xs text-gray-400">❤️ {post.likes ?? 0}</p>
               </div>
-              <div className="text-xs text-gray-400 mt-2">{post.time}</div>
+
+              <div className="text-xs text-gray-400 mt-2">
+                {new Date(post.createdAt || "").toLocaleString()}
+              </div>
             </div>
           ))
         )}
