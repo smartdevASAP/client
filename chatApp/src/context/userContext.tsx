@@ -2,6 +2,7 @@ import { createContext, useState, useEffect, useContext } from "react";
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/axios";
+import toast from "react-hot-toast";
 //type to declare the users (email na akina username na the other stuffs like bio)
 type AppContextType = {
   username: string;
@@ -29,8 +30,16 @@ type AppContextType = {
   email: string;
   setEmail: (val: string) => void;
   sendToServer: () => void;
+  login: () => void;
   actualUser: any;
   setActualUser: (val: any) => any;
+  hasAccount: boolean; //to choose whether to create acc or login
+  setHasAccount: (val: boolean) => any;
+  //to login the user
+  loggingEmail: string;
+  setLoggingEmail: (val: any) => any;
+  loggingPassword: string;
+  setLoggingPassword: (val: any) => any;
 };
 //creating a context
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -58,6 +67,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [confirmPhone, setConfirmPhone] = useState("");
   const [email, setEmail] = useState(localStorage.getItem("email") || "");
   const [actualUser, setActualUser] = useState([]);
+  const [hasAccount, setHasAccount] = useState(false);
+
+  //logging in credentials
+  const [loggingEmail, setLoggingEmail] = useState("");
+  const [loggingPassword, setLoggingPassword] = useState("");
 
   const navigate = useNavigate();
   //finish up button
@@ -95,6 +109,25 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         "🔥 Error sending data:",
         err.response?.data || err.message
       );
+    }
+  };
+  //logging in the user
+  const login = async (): Promise<void> => {
+    try {
+      const payload = { loggingEmail, loggingPassword };
+      const res = await API.post("/users/login", payload);
+      if (res?.data?.success) {
+        console.log("Logged in successfully");
+        toast.success("Logged in successfully");
+        navigate("/dashboard/home");
+      } else {
+        toast.error(res?.data?.message || "Error occurred during login");
+      }
+    } catch (err: any) {
+      const errorMessage =
+        err.response?.data?.message || err.message || "Login failed";
+      console.error("Login error:", errorMessage);
+      toast.error(errorMessage);
     }
   };
 
@@ -161,6 +194,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         sendToServer,
         actualUser,
         setActualUser,
+        hasAccount,
+        setHasAccount,
+        login,
+        loggingEmail,
+        loggingPassword,
+        setLoggingEmail,
+        setLoggingPassword,
       }}
     >
       {children}

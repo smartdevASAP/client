@@ -33,6 +33,13 @@ const Login = () => {
     bio,
     setBio,
     sendToServer,
+    hasAccount,
+    setHasAccount,
+    login,
+    loggingEmail,
+    loggingPassword,
+    setLoggingEmail,
+    setLoggingPassword,
   } = useApp1();
   //--END OF GLOBAL CALL
 
@@ -254,96 +261,158 @@ const Login = () => {
     <div className="sm:flex gap-4 min-h-screen items-start">
       {/* left container */}
       <div className="bg-white sm:w-[60vw] p-6">
-        <h1 className="text-2xl sm:text-3xl text-gray-900 font-bold mb-4">
-          Create Account
-        </h1>
-        <p className="text-sm text-gray-600 mb-6">
-          Create an account and enjoy connecting with friends and making
-          memories.
-        </p>
+        {!hasAccount ? (
+          <>
+            <h1 className="text-2xl sm:text-3xl text-gray-900 font-bold mb-4">
+              Create Account
+            </h1>
+            <p className="text-sm text-gray-600 mb-6">
+              Create an account and enjoy connecting with friends and making
+              memories.
+            </p>
 
-        {/* progress bar */}
-        <div className="w-full flex flex-col items-center mb-8">
-          <p className="text-lg font-semibold text-gray-700 mb-6">
-            <span className="text-blue-600">
-              {Math.round((currentStep / steps.length) * 100)}%
-            </span>{" "}
-            completed
-          </p>
+            {/* progress bar */}
+            <div className="w-full flex flex-col items-center mb-8">
+              <p className="text-lg font-semibold text-gray-700 mb-6">
+                <span className="text-blue-600">
+                  {Math.round((currentStep / steps.length) * 100)}%
+                </span>{" "}
+                completed
+              </p>
 
-          <div className="flex items-start justify-center w-full max-w-3xl relative">
-            {steps.map((step, index) => (
-              <div
-                key={step.id}
-                className="flex flex-col items-center relative w-full cursor-pointer"
-                onClick={() => handleStepClick(step.id)} // 👈 clickable step
-              >
-                {/* Circle */}
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium z-10 transition-all duration-300 ${
-                    step.id < currentStep
-                      ? "bg-blue-600 text-white"
-                      : step.id === currentStep
-                      ? "bg-blue-500 text-white ring-4 ring-blue-200"
-                      : "border-2 border-gray-300 text-gray-500 bg-white"
-                  }`}
-                >
-                  {step.id < currentStep ? <Check size={18} /> : step.id}
-                </div>
-
-                {/* Label */}
-                <p
-                  className={`text-sm mt-3 transition-all ${
-                    step.id <= currentStep
-                      ? "text-gray-800 font-medium"
-                      : "text-gray-500"
-                  }`}
-                >
-                  {step.label}
-                </p>
-
-                {/* Line */}
-                {index !== steps.length - 1 && (
+              <div className="flex items-start justify-center w-full max-w-3xl relative">
+                {steps.map((step, index) => (
                   <div
-                    className={`absolute top-5 left-[55%] right-[-45%] h-[2px] ${
-                      step.id < currentStep
-                        ? "bg-blue-600"
-                        : "bg-blue-500 opacity-50"
-                    }`}
-                  ></div>
-                )}
+                    key={step.id}
+                    className="flex flex-col items-center relative w-full cursor-pointer"
+                    onClick={() => handleStepClick(step.id)}
+                  >
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium z-10 transition-all duration-300 ${
+                        step.id < currentStep
+                          ? "bg-blue-600 text-white"
+                          : step.id === currentStep
+                          ? "bg-blue-500 text-white ring-4 ring-blue-200"
+                          : "border-2 border-gray-300 text-gray-500 bg-white"
+                      }`}
+                    >
+                      {step.id < currentStep ? <Check size={18} /> : step.id}
+                    </div>
+
+                    <p
+                      className={`text-sm mt-3 transition-all ${
+                        step.id <= currentStep
+                          ? "text-gray-800 font-medium"
+                          : "text-gray-500"
+                      }`}
+                    >
+                      {step.label}
+                    </p>
+
+                    {index !== steps.length - 1 && (
+                      <div
+                        className={`absolute top-5 left-[55%] right-[-45%] h-[2px] ${
+                          step.id < currentStep
+                            ? "bg-blue-600"
+                            : "bg-blue-500 opacity-50"
+                        }`}
+                      ></div>
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
 
-        {/* render step content conditionally */}
-        {renderStepContent()}
+            {/* Step content */}
+            {renderStepContent()}
 
-        {/* Back + Save & Continue buttons */}
-        <div className="mt-8 flex justify-between gap-4">
-          <button
-            onClick={handleBack}
-            className="w-1/2 bg-gray-200 text-gray-700 p-3 rounded-sm shadow-xs hover:bg-gray-300 transition-all duration-200"
-          >
-            Back
-          </button>
-          <button
-            onClick={() => {
-              if (currentStep === steps.length) {
-                sendToServer(); // only runs when Finish is showing
-              } else {
-                handleNext();
-              }
-            }}
-            className="w-1/2 bg-[#0437FF] p-3 flex items-center justify-center gap-2 text-white text-center rounded-sm shadow-xs"
-          >
-            <span className="text-xs md:text-sm ">
-              {currentStep === steps.length ? "Finish" : "Save & Continue"}
-            </span>
-            <ArrowRight size={20} />
-          </button>
-        </div>
+            {/* Back + Save & Continue buttons */}
+            <div className="mt-8 flex justify-between gap-4">
+              <button
+                onClick={handleBack}
+                className="w-1/2 bg-gray-200 text-gray-700 p-3 rounded-sm shadow-xs hover:bg-gray-300 transition-all duration-200"
+              >
+                Back
+              </button>
+              <button
+                onClick={() => {
+                  if (currentStep === steps.length) {
+                    sendToServer();
+                  } else {
+                    handleNext();
+                  }
+                }}
+                className="w-1/2 bg-[#0437FF] p-3 flex items-center justify-center gap-2 text-white text-center rounded-sm shadow-xs"
+              >
+                <span className="text-xs md:text-sm ">
+                  {currentStep === steps.length ? "Finish" : "Save & Continue"}
+                </span>
+                <ArrowRight size={20} />
+              </button>
+            </div>
+
+            {/* Already have account toggle */}
+            <p className="text-center mt-6 text-sm text-gray-600">
+              Already have an account?{" "}
+              <span
+                onClick={() => setHasAccount(true)}
+                className="text-[#0437FF] cursor-pointer hover:underline"
+              >
+                Click here to login
+              </span>
+            </p>
+          </>
+        ) : (
+          <>
+            <h1 className="text-2xl sm:text-3xl text-gray-900 font-bold mb-4">
+              Welcome Back
+            </h1>
+            <p className="text-sm text-gray-600 mb-6">
+              Log in to continue connecting and creating memories.
+            </p>
+
+            <div className="space-y-5">
+              <input
+                onChange={(e) => setLoggingEmail(e.target.value)}
+                value={loggingEmail}
+                type="email"
+                className="p-3 border border-gray-300 rounded-sm w-full"
+                placeholder="Email"
+              />
+              {/* <input
+                onChange={(e) => setUsername(e.target.value)}
+                value={username}
+                type="text"
+                className="p-3 border border-gray-300 rounded-sm w-full"
+                placeholder="Username"
+              /> */}
+              <input
+                onChange={(e) => setLoggingPassword(e.target.value)}
+                value={loggingPassword}
+                type="password"
+                className="p-3 border border-gray-300 rounded-sm w-full"
+                placeholder="Password"
+              />
+            </div>
+            {/* different api ENDPOINT */}
+            <button
+              onClick={login}
+              className="w-full mt-8 bg-[#0437FF] text-white p-3 rounded-sm shadow-xs"
+            >
+              Login
+            </button>
+
+            <p className="text-center mt-6 text-sm text-gray-600">
+              Don’t have an account?{" "}
+              <span
+                onClick={() => setHasAccount(false)}
+                className="text-[#0437FF] cursor-pointer hover:underline"
+              >
+                Create one
+              </span>
+            </p>
+          </>
+        )}
       </div>
 
       {/* right container */}
