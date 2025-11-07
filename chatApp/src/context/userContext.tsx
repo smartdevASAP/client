@@ -114,8 +114,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   //logging in the user
   const login = async (): Promise<void> => {
     try {
-      const payload = { loggingEmail, loggingPassword };
-      const res = await API.post("/users/login", payload);
+      const payload = {
+        emailToServer: loggingEmail,
+        passwordToServer: loggingPassword,
+      };
+      console.log({ loggingEmail, loggingPassword });
+      const res = await API.post("/users/login", payload, {
+        withCredentials: true, //  important if you're using cookies/JWTs
+      });
       if (res?.data?.success) {
         console.log("Logged in successfully");
         toast.success("Logged in successfully");
