@@ -39,7 +39,7 @@ export default function Overview() {
       try {
         const res = await API.get("/admin/allUsers"); // Axios response
         if (res.data.success) {
-          setAllUsers(res.data.users); // Assuming your API returns { success: true, users: [...] }
+          setAllUsers(res.data.users);
           console.log(res.data.users);
           console.log(allUsers);
           console.log("admin");
