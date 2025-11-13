@@ -1,27 +1,11 @@
-// import { Navigate } from "react-router-dom";
-// import { useApp } from "../context/userContext";
-// import type { ReactNode } from "react";
-
-// type ProtectedRouteProps = {
-//   children: ReactNode;
-// };
-
-// const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-//   const { username } = useApp();
-//   if (!username) {
-//     return <Navigate to="/" replace />;
-//   }
-
-//   return <>{children}</>;
-// };
-
-// export default ProtectedRoute;
 import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = () => {
-  const username = localStorage.getItem("username"); // check username instead of token
+  // Retrieve the JWT token from localStorage
+  const token = localStorage.getItem("authToken");
 
-  return username ? <Outlet /> : <Navigate to="/" replace />;
+  // Allow access only if the token exists
+  return token ? <Outlet /> : <Navigate to="/" replace />;
 };
 
 export default ProtectedRoute;

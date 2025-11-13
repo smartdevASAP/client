@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Check, Bell, Shield, User, Palette, Trash } from "lucide-react";
 import { useApp1 } from "../context/userContext";
+import { useNavigate } from "react-router-dom";
 
 const Settings = () => {
   const [currentTab, setCurrentTab] = useState("account");
@@ -38,7 +39,12 @@ const Settings = () => {
     { id: "privacy", label: "Privacy", icon: <Shield size={18} /> },
     { id: "danger", label: "Danger Zone", icon: <Trash size={18} /> },
   ];
-
+  const navigate = useNavigate();
+  //delete dummy
+  const dummyDelete = (): any | void => {
+    localStorage.clear();
+    navigate("/");
+  };
   const renderTab = () => {
     switch (currentTab) {
       case "account":
@@ -191,7 +197,10 @@ const Settings = () => {
               Deleting your account will permanently remove all your data,
               chats, and posts. This action cannot be undone.
             </p>
-            <button className="px-6 py-3 bg-red-600 text-white rounded-sm hover:bg-red-700">
+            <button
+              onClick={() => dummyDelete()}
+              className="px-6 cursor-pointer py-3 bg-red-600 text-white rounded-sm hover:bg-red-700"
+            >
               Delete Account
             </button>
           </div>

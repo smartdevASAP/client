@@ -1,5 +1,8 @@
 import { motion } from "framer-motion";
 import { Users, FileText, ThumbsUp, MessageSquare } from "lucide-react";
+import API from "../../api/axios";
+import toast from "react-hot-toast";
+import { useState, useEffect } from "react";
 
 export default function Overview() {
   const stats = [
@@ -28,6 +31,28 @@ export default function Overview() {
       color: "from-blue-100 to-blue-50",
     },
   ];
+  //local state variables
+  const [allUsers, setAllUsers] = useState([]);
+  //network requests to the DB
+  useEffect(() => {
+    const fetchAllUsers = async () => {
+      try {
+        const res = await API.get("/admin/allUsers"); // Axios response
+        if (res.data.success) {
+          setAllUsers(res.data.users); // Assuming your API returns { success: true, users: [...] }
+          console.log(res.data.users);
+          console.log(allUsers);
+          console.log("admin");
+        } else {
+          toast.error(res.data.message || "Failed to fetch users");
+        }
+      } catch (err: any) {
+        toast.error(err.response?.data?.message || err.message);
+      }
+    };
+
+    fetchAllUsers();
+  }, []);
 
   return (
     <div className="p-6 bg-white min-h-screen text-gray-800">
