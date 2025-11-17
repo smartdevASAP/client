@@ -167,7 +167,7 @@
 import { useEffect, useState } from "react";
 import { useApp } from "../context/postContext";
 import { useApp1 } from "../context/userContext";
-import { Share2, Edit3, Menu, LogOut, Users, Heart } from "lucide-react";
+import { Share2, Menu, LogOut, Users, Heart } from "lucide-react";
 import toast from "react-hot-toast";
 import API from "../api/axios";
 // import dayjs from "dayjs";
@@ -204,7 +204,7 @@ function Home() {
         if (res.data.success && Array.isArray(res.data.posts)) {
           setPosts(res.data.posts);
         } else {
-          console.error("❌ Failed to fetch posts:", res.data.message);
+          console.error(" Failed to fetch posts:", res.data.message);
         }
         setActualUser(res.data);
         if (res2.data.success) {
@@ -212,7 +212,7 @@ function Home() {
           setLocalCaption(res.data.bio);
         }
       } catch (err) {
-        console.error("🔥 Error fetching posts:", err);
+        console.error(" Error fetching posts:", err);
       } finally {
         setLoading(false);
       }
